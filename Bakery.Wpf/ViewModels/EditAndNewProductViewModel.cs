@@ -59,6 +59,8 @@ namespace Bakery.Wpf.ViewModels
                 OnPropertyChanged(nameof(Price));
             }
         }
+        [MinLength(1,ErrorMessage = "Produktname ist zu kurz")]
+        [MaxLength(20, ErrorMessage = "Produktname darf maximal 20 Zeichen lang sein")]
         public string Name
         {
             get => _name;
@@ -66,6 +68,7 @@ namespace Bakery.Wpf.ViewModels
             {
                 _name = value;
                 OnPropertyChanged(nameof(Name));
+                ValidateViewModelProperties();
             }
         }
 
@@ -100,7 +103,18 @@ namespace Bakery.Wpf.ViewModels
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            throw new NotImplementedException();
+             if(Name.Length < 1)
+             {
+                 yield return new ValidationResult("Produktname ist zu kurz", new string[] { nameof(Name) });
+             }
+             if(Name.Length > 20)
+             {
+                 yield return new ValidationResult("$Produktname darf maximal 20 Zeichen lang sein", new string[] { nameof(Name) });
+             }
+            /*return new List<ValidationResult>
+           {
+               ValidationResult.Success
+           };*/
         }
 
         private ICommand _cmdSave;
@@ -130,7 +144,13 @@ namespace Bakery.Wpf.ViewModels
                                  }
                                  else
                                  {
-
+                                     Product = new Product()
+                                     {
+                                         ProductNr = ProductNr,
+                                         Name = Name,
+                                         Price = Double.Parse(Price)
+                                     };
+                                     await uow.Products.AddAsync(Product);
                                  }
                                  await uow.SaveChangesAsync();
                                  Controller.CloseWindow(this);

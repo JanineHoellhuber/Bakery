@@ -37,5 +37,25 @@ namespace Bakery.Persistence
             return await _dbContext.Products.Where(p => p.Id == id).SingleOrDefaultAsync();
         }
 
+        public async Task AddAsync(Product product)
+        {
+             await _dbContext.Products.AddAsync(product);
+        }
+        public async Task<IEnumerable<ProductDto>> GetWithFilterAsync(double priceFrom, double priceTo)
+        {
+            var query = _dbContext.Products.Where(p => p.Price >= priceFrom)
+                .AsQueryable();
+
+            if (priceTo > 0)
+            {
+                query = query.Where(p => p.Price <= priceTo);
+            }
+
+            return await query
+                .Include(p => p.OrderItems)
+                .Select(p => new ProductDto(p))
+                .ToArrayAsync();
+        }
+
     }
 }

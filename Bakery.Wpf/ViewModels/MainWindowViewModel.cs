@@ -17,7 +17,9 @@ namespace Bakery.Wpf.ViewModels
         private string _priceFrom;
         private string _priceTo;
         private ProductDto _selectedProduct;
-        private List<ProductDto> _productList;
+        //private List<ProductDto> _productList;
+        private double _avgPrice;
+
 
         public ObservableCollection<ProductDto> Products
         {
@@ -55,12 +57,17 @@ namespace Bakery.Wpf.ViewModels
                 OnPropertyChanged(nameof(SelectedProduct));
             }
         }
-
     public MainWindowViewModel(IWindowController controller) : base(controller)
     {
-
-      LoadCommands();
+      
+       LoadCommands();
     }
+
+    public double APrice()
+        {
+            return _avgPrice = Products.Average(p => p.Price);
+
+        }
 
     private void LoadCommands()
     {
@@ -85,21 +92,59 @@ namespace Bakery.Wpf.ViewModels
     private async Task LoadProducts()
     {
             IUnitOfWork uow = new UnitOfWork();
-            var products = await uow.Products
-                .GetAllAsync();
+            double priceFrom = 0;
+            double priceTo = 0;
 
-            var pro = products
-                .Select(p => new ProductDto(p));
+            double.TryParse(PriceFrom, out priceFrom);
+            double.TryParse(PriceTo, out priceTo);
 
-            //_productList = new List<ProductDto>(pro);
+            var product = await uow.Products.GetWithFilterAsync(priceFrom, priceTo);
 
-            Products = new ObservableCollection<ProductDto>(pro);
+      
+
+            Products = new ObservableCollection<ProductDto>(product);
 
             SelectedProduct = Products.FirstOrDefault();
 
+            AvgPrice = APrice();
+            
+        }
 
-    }
-    private ICommand _cmdEditProduct;
+
+        public double AvgPrice
+        {
+
+            get => _avgPrice;
+             set
+             {
+                _avgPrice = value;
+                OnPropertyChanged();
+             }
+        }
+
+        private ICommand _cmdSearch;
+
+        public ICommand CmdSearch
+        {
+            get
+            {
+                if (_cmdSearch == null)
+                {
+                    _cmdSearch = new RelayCommand(
+                       execute: _ =>
+                       {
+                           LoadProducts();
+                       },
+                       canExecute: _ => true
+                       );
+                }
+                return _cmdSearch;
+            }
+            set => _cmdSearch = value;
+
+        }
+
+        private ICommand _cmdEditProduct;
 
     public ICommand CmdEditProduct
     {
@@ -121,6 +166,28 @@ namespace Bakery.Wpf.ViewModels
             set => _cmdEditProduct = value;
 
     }
+
+        private ICommand _cmdNewProduct;
+
+        public ICommand CmdNewProduct
+        {
+            get
+            {
+                if (_cmdNewProduct == null)
+                {
+                    _cmdNewProduct = new RelayCommand(
+                       execute: _ =>
+                       {
+                           Controller.ShowWindow(new EditAndNewProductViewModel(Controller, null), true);
+                           LoadProducts();
+                       },
+                       canExecute: _ => true
+                       );
+                }
+                return _cmdNewProduct;
+            }
+            set => _cmdNewProduct = value;
+        }
 
     public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
