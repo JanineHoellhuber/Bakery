@@ -157,18 +157,19 @@ namespace Bakery.Wpf.ViewModels
                              }
                              catch (ValidationException ex)
                              {
-                                 if(ex.Value is IEnumerable<string> properties)
-                                 {
-                                     foreach (var property in properties)
-                                     {
-                                         Errors.Add(property, new List<string> { ex.ValidationResult.ErrorMessage });
+                                 //if(ex.Value is IEnumerable<string> properties)
+                                 //{
+                                 //    foreach (var property in properties)
+                                 //    {
+                                 //        Errors.Add(property, new List<string> { ex.ValidationResult.ErrorMessage });
 
-                                     }
-                                 }
-                                 else
-                                 {
-                                     DbError = ex.ValidationResult.ToString();
-                                 }
+                                 //    }
+                                 //}
+                                 //else
+                                 //{
+                                 //    DbError = ex.ValidationResult.ToString();
+                                 //}
+                                 DbError = ex.Message;
                              }
                          },
                         canExecute: _ => !HasErrors

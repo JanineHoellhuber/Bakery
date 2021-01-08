@@ -59,8 +59,7 @@ namespace Bakery.Persistence
             if(entity is Product product)
             {
                 
-                if(await _dbContext.Products.AnyAsync(p => p.Id == product.Id && p.Name == product.Name && p.ProductNr == product.ProductNr 
-                && p.Price == product.Price))
+                if(await _dbContext.Products.AnyAsync(p => p.Id != product.Id && p.Name != product.Name))
                 {
                     throw new ValidationException($"Produkt mit Namen {product.Name} existiert bereits");
                 }

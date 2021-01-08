@@ -33,7 +33,7 @@
         <TextBlock Grid.Column="0" Grid.Row="6" Margin="10,0,0,0" Text="Preis:" VerticalAlignment="Center"/>
         <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding Price, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <StackPanel Grid.Row="8" Grid.Column="0" Orientation="Horizontal">
+        <StackPanel Grid.Row="8" Grid.Column="0" Orientation="Horizontal" Grid.ColumnSpan="2" Margin="0,0,217,0">
             <Button Margin="6" Command="{Binding Path=CmdSave}">Speichern</Button>
             <Button Margin="6" Command="{Binding Path=CmdUndo}">Rückgängig</Button>
             <Label Style="{StaticResource ResourceKey=ErrorFontColorStyle}" Content="{Binding DbError}"/>
